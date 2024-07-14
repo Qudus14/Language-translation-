@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation App</title>
+</head>
+<body>
+    <textarea id="englishText" rows="4" cols="50" placeholder="Enter English text"></textarea>
+    <button onclick="translateText()">Translate</button>
+    <h2>Translation</h2>
+    <p id="translatedText"></p>
+
+    <script>
+        async function translateText() {
+            const englishText = document.getElementById('englishText').value;
+            try {
+                const response = await fetch('http://127.0.0.1:5000/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: englishText })
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch');
+                }
+                const data = await response.json();
+                document.getElementById('translatedText').innerText = data.translation;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('translatedText').innerText = 'Error: Unable to fetch translation';
+            }
+        }
+    </script>
+</body>
+</html>
