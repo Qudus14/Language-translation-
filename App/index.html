@@ -1,35 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Translation App</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="img/KWASU.jpg" />
+    <title>Language Translator</title>
 </head>
 <body>
-    <textarea id="englishText" rows="4" cols="50" placeholder="Enter English text"></textarea>
-    <button onclick="translateText()">Translate</button>
-    <h2>Translation</h2>
-    <p id="translatedText"></p>
+    <div class="container">
+        <div class="card input-wrapper">
+            <div class="from">
+                <span class="heading">From :</span>
+                <div class="dropdown-container" id="input-language">
+                    <div class="dropdown-toggle">
+                      <img src="img/ENGLISH.png" width="30px"height="30px">
+                      <span class="selected" data-value="auto">ENGLISH</span>          
+                    </div>
+                </div>
+            </div>
+            <div class="text-area">
+                <textarea
+                  id="input-text"
+                  cols="30"
+                  rows="10"
+                  placeholder="Enter your text here"
+                ></textarea>
+                <div class="chars"><span id="input-chars">0</span> / 5000</div>
+            </div>
+        </div>
 
+        <div class="center">
+            <button class="swap-position" onclick="translateText()">Translate</button>
+        </div>
+
+        <div class="card output-wrapper">
+            <div class="to">
+                <span class="heading">To :</span>
+                <div class="dropdown-container" id="output-language">
+                    <div class="dropdown-toggle">
+                        <img src="img/Yoruba.png" width="30px"height="30px">
+                        <span class="selected" data-value="en">YORUBA</span>
+                    </div>
+                </div>
+            </div>
+            <textarea
+              id="output-text"
+              cols="30"
+              rows="10"
+              placeholder="Translated text will appear here"
+              disabled
+            ></textarea>
+        </div>
+    </div>
     <script>
         async function translateText() {
-            const englishText = document.getElementById('englishText').value;
+            const inputText = document.getElementById('input-text').value;
             try {
                 const response = await fetch('http://127.0.0.1:5000/translate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ text: englishText })
+                    body: JSON.stringify({ text: inputText })
                 });
                 if (!response.ok) {
                     throw new Error('Failed to fetch');
                 }
                 const data = await response.json();
-                document.getElementById('translatedText').innerText = data.translation;
+                document.getElementById('output-text').value = data.translation; // Use 'value' for textareas
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('translatedText').innerText = 'Error: Unable to fetch translation';
+                document.getElementById('output-text').value = 'Error: Unable to fetch translation'; // Use 'value' for textareas
             }
         }
     </script>

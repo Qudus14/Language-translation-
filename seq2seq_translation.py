@@ -82,12 +82,7 @@ def read_file(filepath):
 
 
 
-######################################################################
-# To read the data file we will split the file into lines, and then split
-# lines into pairs. The files are all English → Other Language, so if we
-# want to translate from Other Language → English I added the ``reverse``
-# flag to reverse the pairs.
-#
+
 def readLangs(lang1, lang2, reverse=False):
     datasets = ['data/eng-yor.csv']
     all_pairs = []
@@ -104,14 +99,7 @@ def readLangs(lang1, lang2, reverse=False):
 
     return all_pairs
 
-######################################################################
-# Since there are a *lot* of example sentences and we want to train
-# something quickly, we'll trim the data set to only relatively short and
-# simple sentences. Here the maximum length is 10 words (that includes
-# ending punctuation) and we're filtering to sentences that translate to
-# the form "I am" or "He is" etc. (accounting for apostrophes replaced
-# earlier).
-#
+
 
 MAX_LENGTH = 10
 
@@ -133,15 +121,7 @@ def filterPairs(pairs):
     return [pair for pair in pairs if filterPair(pair)]
 
 
-######################################################################
-# The full process for preparing the data is:
-#
-# -  Read text file and split into lines, split lines into pairs
-# -  Normalize text, filter by length and content
-# -  Make word lists from sentences in pairs
-#
 
-# Function to prepare data
 def prepareData(lang1, lang2, reverse=False):
     print("Reading lines...")
     pairs = readLangs(lang1, lang2, reverse)
@@ -186,23 +166,7 @@ class EncoderRNN(nn.Module):
         output, hidden = self.gru(embedded)
         return output, hidden
 
-######################################################################
-# The Decoder
-# -----------
-#
-# The decoder is another RNN that takes the encoder output vector(s) and
-# outputs a sequence of words to create the translation.
-#
 
-
-######################################################################
-# Simple Decoder
-# ^^^^^^^^^^^^^^
-#
-# In the simplest seq2seq decoder we use only last output of the encoder.
-# This last output is sometimes called the *context vector* as it encodes
-# context from the entire sequence. This context vector is used as the
-# initial hidden state of the decoder.
 
 class DecoderRNN(nn.Module):
     def __init__(self, hidden_size, output_size):
@@ -242,23 +206,6 @@ class DecoderRNN(nn.Module):
 
 
 
-######################################################################
-# Attention Decoder
-# Attention allows the decoder network to "focus" on a different part of
-# the encoder's outputs for every step of the decoder's own outputs. First
-# we calculate a set of *attention weights*. These will be multiplied by
-# the encoder output vectors to create a weighted combination. The result
-# (called ``attn_applied`` in the code) should contain information about
-# that specific part of the input sequence, and thus help the decoder
-# choose the right output words.
-#
-# Bahdanau attention, also known as additive attention, is a commonly used
-# attention mechanism in sequence-to-sequence models, particularly in neural
-# machine translation tasks. It was introduced by Bahdanau et al. in their
-# paper titled `Neural Machine Translation by Jointly Learning to Align and Translate <https://arxiv.org/pdf/1409.0473.pdf>`__.
-# This attention mechanism employs a learned alignment model to compute attention
-# scores between the encoder and decoder hidden states. It utilizes a feed-forward
-# neural network to calculate alignment scores.
 
 class BahdanauAttention(nn.Module):
     def __init__(self, hidden_size):
@@ -327,18 +274,7 @@ class AttnDecoderRNN(nn.Module):
         return output, hidden, attn_weights
 
 
-######################################################################
-# Training
-# ========
-#
-# Preparing Training Data
-# -----------------------
-#
-# To train, for each pair we will need an input tensor (indexes of the
-# words in the input sentence) and target tensor (indexes of the words in
-# the target sentence). While creating these vectors we will append the
-# EOS token to both sequences.
-#
+
 
 def indexesFromSentence(lang, sentence):
     return [lang.word2index[word] for word in sentence.split(' ')]
@@ -376,15 +312,7 @@ def get_dataloader(batch_size):
     return input_lang, output_lang, train_dataloader
 
 
-######################################################################
-# Training the Model
-# ------------------
-#
-# To train we run the input sentence through the encoder, and keep track
-# of every output and the latest hidden state. Then the decoder is given
-# the ``<SOS>`` token as its first input, and the last hidden state of the
-# encoder as its first hidden state.
-#
+
 
 def train_epoch(dataloader, encoder, decoder, encoder_optimizer,
           decoder_optimizer, criterion):
@@ -413,10 +341,7 @@ def train_epoch(dataloader, encoder, decoder, encoder_optimizer,
     return total_loss / len(dataloader)
 
 
-######################################################################
-# This is a helper function to print time elapsed and estimated time
-# remaining given the current time and progress %.
-#
+
 
 import time
 import math
